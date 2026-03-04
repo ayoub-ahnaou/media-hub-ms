@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: media-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: media_db
+      MYSQL_USER: media_user
+      MYSQL_PASSWORD: media_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - media_mysql_data:/var/lib/mysql
+    networks:
+      - media-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  media-service:
+    build: .
+    container_name: media-service
+    restart: on-failure
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/media_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: media_user
+      SPRING_DATASOURCE_PASSWORD: media_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQL8Dialect
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - media-network
+
+volumes:
+  media_mysql_data:
+
+networks:
+  media-network:
+    driver: bridge
