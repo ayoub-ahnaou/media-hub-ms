@@ -1,0 +1,23 @@
+package com.user_service.user_service.util;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class AuthResponse<T> {
+    private int status;
+    private String message;
+    private T data;
+    private long timestamp;
+
+    public AuthResponse(int status, String message, T data) {
+        this.status = status;
+        this.message = message;
+        this.data = data;
+        this.timestamp = System.currentTimeMillis();
+    }
+}
+

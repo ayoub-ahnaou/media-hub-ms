@@ -1,0 +1,67 @@
+### User Service - Exemples de Requêtes
+
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### 1. Enregistrer un utilisateur
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "username": "john_doe",
+  "email": "john@example.com",
+  "password": "Pass123!",
+  "firstName": "John",
+  "lastName": "Doe"
+}
+
+### 2. Enregistrer un deuxième utilisateur
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "username": "jane_smith",
+  "email": "jane@example.com",
+  "password": "Pass456!",
+  "firstName": "Jane",
+  "lastName": "Smith"
+}
+
+### 3. Se connecter
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "username": "john_doe",
+  "password": "Pass123!"
+}
+
+### 4. Valider un token
+GET {{baseUrl}}/api/auth/validate?token=votre_token_ici
+Content-Type: {{contentType}}
+
+### 5. Lister tous les utilisateurs (besoin de token)
+GET {{baseUrl}}/api/users
+Authorization: Bearer votre_token_ici
+Content-Type: {{contentType}}
+
+### 6. Récupérer un utilisateur par ID (besoin de token)
+GET {{baseUrl}}/api/users/1
+Authorization: Bearer votre_token_ici
+Content-Type: {{contentType}}
+
+### 7. Mettre à jour un utilisateur (besoin de token)
+PUT {{baseUrl}}/api/users/1
+Authorization: Bearer votre_token_ici
+Content-Type: {{contentType}}
+
+{
+  "firstName": "Jonathan",
+  "lastName": "Doe Jr."
+}
+
+### 8. Supprimer un utilisateur (besoin de token)
+DELETE {{baseUrl}}/api/users/2
+Authorization: Bearer votre_token_ici
+Content-Type: {{contentType}}
+
