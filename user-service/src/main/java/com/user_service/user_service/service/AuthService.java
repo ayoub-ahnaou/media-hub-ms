@@ -32,48 +32,40 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private  final AuthMapper authMapper;
 
-    public LoginResponseDTO register(LoginRequestDTO request) {
-        // Vérifier si username ou email déjà pris
+    public String register(LoginRequestDTO request) {
+        // Check if username or email is already taken
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username déjà utilisé");
+            throw new RuntimeException("Username is already taken");
         }
-        if (userRepository.existsByEmail(request.getUsername())) {
-            throw new RuntimeException("Email déjà utilisé");
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email is already taken");
         }
 
         User user = User.builder()
                 .username(request.getUsername())
-                .email(request.getUsername())
+                .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER) // rôle par défaut
+                .role(Role.USER) // default role
                 .build();
 
         userRepository.save(user);
 
-        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
-        );
-
-        String token = jwtService.generateToken(userDetails);
-        return authMapper.toLoginResponseDTO(user,token);
+        return "Account created successfully!";
     }
-
     public LoginResponseDTO login(LoginRequestDTO request) {
         // Lance une exception si credentials invalides
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
+                        request.getEmail(),
                         request.getPassword()
                 )
         );
 
-        User user = userRepository.findByEmail(request.getUsername())
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
+                user.getEmail(),
                 user.getPassword(),
                 List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
         );
