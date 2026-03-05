@@ -2,120 +2,97 @@ package com.user_service.user_service.service;
 
 import com.user_service.user_service.dto.UserRequestDTO;
 import com.user_service.user_service.dto.UserResponseDTO;
+import com.user_service.user_service.enums.Role;
+import com.user_service.user_service.exception.UserAlreadyExistsException;
+import com.user_service.user_service.exception.UserNotFoundException;
+import com.user_service.user_service.mapper.UserMapper;
 import com.user_service.user_service.model.User;
 import com.user_service.user_service.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+@AllArgsConstructor
 @Service
 public class UserService {
-//
-//    @Autowired
-//    private UserRepository userRepository;
-//
-//    // Create a new user
-//    public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
-//        User user = new User();
-//        user.setUsername(userRequestDTO.getUsername());
-//        user.setEmail(userRequestDTO.getEmail());
-//        user.setPassword(userRequestDTO.getPassword());
-//        user.setFirstName(userRequestDTO.getFirstName());
-//        user.setLastName(userRequestDTO.getLastName());
-//        user.setPhoneNumber(userRequestDTO.getPhoneNumber());
-//        user.setIsActive(true);
-//
-//        User savedUser = userRepository.save(user);
-//        return convertToResponseDTO(savedUser);
-//    }
-//
-//    // Get user by ID
-//    public UserResponseDTO getUserById(Long id) {
-//        return userRepository.findById(id)
-//                .map(this::convertToResponseDTO)
-//                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-//    }
-//
-//    // Get user by username
-//    public UserResponseDTO getUserByUsername(String username) {
-//        return userRepository.findByUsername(username)
-//                .map(this::convertToResponseDTO)
-//                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
-//    }
-//
-//    // Get user by email
-//    public UserResponseDTO getUserByEmail(String email) {
-//        return userRepository.findByEmail(email)
-//                .map(this::convertToResponseDTO)
-//                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
-//    }
-//
-//    // Get all users
-//    public List<UserResponseDTO> getAllUsers() {
-//        return userRepository.findAll().stream()
-//                .map(this::convertToResponseDTO)
-//                .collect(Collectors.toList());
-//    }
-//
-//    // Update user
-//    public UserResponseDTO updateUser(Long id, UserRequestDTO userRequestDTO) {
-//        User user = userRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-//
-//        if (userRequestDTO.getUsername() != null) {
-//            user.setUsername(userRequestDTO.getUsername());
-//        }
-//        if (userRequestDTO.getEmail() != null) {
-//            user.setEmail(userRequestDTO.getEmail());
-//        }
-//        if (userRequestDTO.getPassword() != null) {
-//            user.setPassword(userRequestDTO.getPassword());
-//        }
-//        if (userRequestDTO.getFirstName() != null) {
-//            user.setFirstName(userRequestDTO.getFirstName());
-//        }
-//        if (userRequestDTO.getLastName() != null) {
-//            user.setLastName(userRequestDTO.getLastName());
-//        }
-//        if (userRequestDTO.getPhoneNumber() != null) {
-//            user.setPhoneNumber(userRequestDTO.getPhoneNumber());
-//        }
-//
-//        User updatedUser = userRepository.save(user);
-//        return convertToResponseDTO(updatedUser);
-//    }
-//
-//    // Delete user
-//    public void deleteUser(Long id) {
-//        if (!userRepository.existsById(id)) {
-//            throw new RuntimeException("User not found with id: " + id);
-//        }
-//        userRepository.deleteById(id);
-//    }
-//
-//    // Check if user exists
-//    public Boolean userExistsByUsername(String username) {
-//        return userRepository.existsByUsername(username);
-//    }
-//
-//    public Boolean userExistsByEmail(String email) {
-//        return userRepository.existsByEmail(email);
-//    }
-//
-//    // Convert User entity to UserResponseDTO
-//    private UserResponseDTO convertToResponseDTO(User user) {
-//        UserResponseDTO dto = new UserResponseDTO();
-//        dto.setId(user.getId());
-//        dto.setUsername(user.getUsername());
-//        dto.setEmail(user.getEmail());
-//        dto.setFirstName(user.getFirstName());
-//        dto.setLastName(user.getLastName());
-//        dto.setPhoneNumber(user.getPhoneNumber());
-//        dto.setIsActive(user.getIsActive());
-//        dto.setCreatedAt(user.getCreatedAt());
-//        dto.setUpdatedAt(user.getUpdatedAt());
-//        return dto;
-//    }
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    // ✅ CREATE
+
+    public UserResponseDTO createUser(UserRequestDTO dto) {
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            throw new UserAlreadyExistsException("Email déjà utilisé : " + dto.getEmail());
+        }
+        if (userRepository.existsByUsername(dto.getUsername())) {
+            throw new UserAlreadyExistsException("Username déjà utilisé : " + dto.getUsername());
+        }
+
+        User user = userMapper.toEntity(dto);
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setRole(Role.USER); // rôle par défaut
+
+        return userMapper.toDTO(userRepository.save(user));
+    }
+
+    // ✅ GET BY ID
+
+    public UserResponseDTO getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur introuvable avec l'id : " + id));
+        return userMapper.toDTO(user);
+    }
+
+    // ✅ GET ALL
+
+    public List<UserResponseDTO> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(userMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    // ✅ UPDATE
+
+    public UserResponseDTO updateUser(Long id, UserRequestDTO dto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur introuvable avec l'id : " + id));
+
+        // Vérifier si le nouvel email appartient à un autre utilisateur
+        if (!user.getEmail().equals(dto.getEmail()) && userRepository.existsByEmail(dto.getEmail())) {
+            throw new UserAlreadyExistsException("Email déjà utilisé : " + dto.getEmail());
+        }
+
+        // Vérifier si le nouveau username appartient à un autre utilisateur
+        if (!user.getUsername().equals(dto.getUsername()) && userRepository.existsByUsername(dto.getUsername())) {
+            throw new UserAlreadyExistsException("Username déjà utilisé : " + dto.getUsername());
+        }
+
+        user.setUsername(dto.getUsername());
+        user.setEmail(dto.getEmail());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+
+        return userMapper.toDTO(userRepository.save(user));
+    }
+
+    // ✅ DELETE
+
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException("Utilisateur introuvable avec l'id : " + id);
+        }
+        userRepository.deleteById(id);
+    }
+
+
+    public UserResponseDTO updateRole(Long id, Role role) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur introuvable avec l'id : " + id));
+        user.setRole(role);
+        return userMapper.toDTO(userRepository.save(user));
+    }
 }
