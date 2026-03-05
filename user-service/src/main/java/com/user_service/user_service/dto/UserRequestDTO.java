@@ -1,18 +1,17 @@
 package com.user_service.user_service.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor @AllArgsConstructor
 public class UserRequestDTO {
-    private String username;
-    private String email;
-    private String password;
-    private String firstName;
-    private String lastName;
-    private String phoneNumber;
-}
 
+
+    private String username;
+
+
+    private String email;
+
+    private String password;
+}
