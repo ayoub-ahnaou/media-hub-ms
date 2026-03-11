@@ -38,4 +38,28 @@ public class GlobalExceptionHandler {
                 .build()
         );
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.status(400).body(
+            ApiErrorResponse.builder()
+                .status(400)
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiErrorResponse> handleGeneral(Exception ex) {
+        return ResponseEntity.status(500).body(
+            ApiErrorResponse.builder()
+                .status(500)
+                .error("Internal Server Error")
+                .message("An unexpected error occurred")
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
 }

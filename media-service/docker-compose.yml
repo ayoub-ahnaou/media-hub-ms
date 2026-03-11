@@ -11,7 +11,7 @@ services:
       MYSQL_USER: media_user
       MYSQL_PASSWORD: media_password
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - media_mysql_data:/var/lib/mysql
     networks:
@@ -33,7 +33,6 @@ services:
       SPRING_DATASOURCE_USERNAME: media_user
       SPRING_DATASOURCE_PASSWORD: media_password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQL8Dialect
     depends_on:
       mysql:
         condition: service_healthy

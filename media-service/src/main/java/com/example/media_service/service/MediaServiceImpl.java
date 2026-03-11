@@ -28,6 +28,7 @@ public class MediaServiceImpl implements MediaService {
             .director(m.getDirector())
             .releaseYear(m.getReleaseYear())
             .thumbnailUrl(m.getThumbnailUrl())
+            .streamUrl(m.getStreamUrl())
             .createdAt(m.getCreatedAt())
             .build();
     }
