@@ -1,0 +1,139 @@
+### User Service API Requests - AVEC JWT
+
+### Variables
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### ======================================
+### AUTHENTIFICATION (Pas de JWT requis)
+### ======================================
+
+### 1. Enregistrer un nouvel utilisateur
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "username": "john_doe",
+  "email": "john@example.com",
+  "password": "securePassword123",
+  "firstName": "John",
+  "lastName": "Doe",
+  "phoneNumber": "+1234567890"
+}
+
+### 2. Login - Obtenir les tokens
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "username": "john_doe",
+  "password": "securePassword123"
+}
+
+### 3. Rafraîchir le token (utiliser le refreshToken obtenu à la connexion)
+POST {{baseUrl}}/api/auth/refresh-token
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "votre_refresh_token_ici"
+}
+
+### 4. Valider un token JWT
+GET {{baseUrl}}/api/auth/validate?token=votre_token_ici
+Content-Type: {{contentType}}
+
+### 5. Extraire le username du token
+GET {{baseUrl}}/api/auth/username?token=votre_token_ici
+Content-Type: {{contentType}}
+
+### ======================================
+### USERS (JWT requis)
+### ======================================
+
+### 6. Récupérer tous les utilisateurs (avec JWT)
+GET {{baseUrl}}/api/users
+Authorization: Bearer votre_token_ici
+Content-Type: {{contentType}}
+
+### 7. Récupérer un utilisateur par ID (avec JWT)
+GET {{baseUrl}}/api/users/1
+Authorization: Bearer votre_token_ici
+Content-Type: {{contentType}}
+
+### 8. Récupérer un utilisateur par username (avec JWT)
+GET {{baseUrl}}/api/users/username/john_doe
+Authorization: Bearer votre_token_ici
+Content-Type: {{contentType}}
+
+### 9. Récupérer un utilisateur par email (avec JWT)
+GET {{baseUrl}}/api/users/email/john@example.com
+Authorization: Bearer votre_token_ici
+Content-Type: {{contentType}}
+
+### 10. Mettre à jour un utilisateur (avec JWT)
+PUT {{baseUrl}}/api/users/1
+Authorization: Bearer votre_token_ici
+Content-Type: {{contentType}}
+
+{
+  "firstName": "Jonathan",
+  "lastName": "Doe",
+  "phoneNumber": "+1111111111"
+}
+
+### 11. Vérifier si un username existe (avec JWT)
+GET {{baseUrl}}/api/users/check/username/john_doe
+Authorization: Bearer votre_token_ici
+Content-Type: {{contentType}}
+
+### 12. Vérifier si un email existe (avec JWT)
+GET {{baseUrl}}/api/users/check/email/john@example.com
+Authorization: Bearer votre_token_ici
+Content-Type: {{contentType}}
+
+### 13. Supprimer un utilisateur (avec JWT)
+DELETE {{baseUrl}}/api/users/1
+Authorization: Bearer votre_token_ici
+Content-Type: {{contentType}}
+
+### ======================================
+### FLOW COMPLET D'AUTHENTIFICATION
+### ======================================
+
+### Étape 1: Enregistrer un nouvel utilisateur
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "username": "jane_smith",
+  "email": "jane@example.com",
+  "password": "securePassword456",
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "phoneNumber": "+0987654321"
+}
+
+### Étape 2: Login avec les credentials
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "username": "jane_smith",
+  "password": "securePassword456"
+}
+
+### Étape 3: Utiliser le token pour accéder aux ressources protégées
+### (Copier le token reçu de /api/auth/login et le mettre dans Authorization header)
+GET {{baseUrl}}/api/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+Content-Type: {{contentType}}
+
+### Étape 4: Rafraîchir le token quand il expire
+### (Utiliser le refreshToken obtenu de /api/auth/login)
+POST {{baseUrl}}/api/auth/refresh-token
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiJ9..."
+}
+
