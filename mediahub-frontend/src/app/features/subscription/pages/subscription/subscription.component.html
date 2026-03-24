@@ -1,0 +1,75 @@
+<section class="mb-4">
+  <h1 class="h3 mb-1">Gestion de l'abonnement</h1>
+  <p class="text-muted mb-0">Créer et annuler vos abonnements</p>
+</section>
+
+<div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+<div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+<section class="card mb-4">
+  <div class="card-body">
+    <h2 class="h6">Nouveau abonnement</h2>
+    <div class="row g-2 align-items-end">
+      <div class="col-12 col-md-4">
+        <label class="form-label">Media ID</label>
+        <input class="form-control" type="number" [(ngModel)]="mediaId" placeholder="1">
+      </div>
+      <div class="col-12 col-md-4">
+        <label class="form-label">Plan</label>
+        <input class="form-control" [(ngModel)]="plan" placeholder="STANDARD">
+      </div>
+      <div class="col-12 col-md-4">
+        <label class="form-label">Date fin</label>
+        <input class="form-control" type="date" [(ngModel)]="endDate">
+      </div>
+      <div class="col-12">
+        <button class="btn btn-primary" [disabled]="actionLoading" (click)="createSubscription()">
+          {{ actionLoading ? 'Traitement...' : 'Créer abonnement' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div *ngIf="loading" class="alert alert-info">Chargement des abonnements...</div>
+
+<section class="card" *ngIf="!loading">
+  <div class="card-body">
+    <h2 class="h6">Mes abonnements</h2>
+
+    <div class="table-responsive" *ngIf="subscriptions.length > 0; else emptyState">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Media</th>
+            <th>Plan</th>
+            <th>Status</th>
+            <th>Début</th>
+            <th>Fin</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let sub of subscriptions">
+            <td>{{ sub.id }}</td>
+            <td>{{ sub.mediaId }}</td>
+            <td>{{ sub.plan }}</td>
+            <td><span class="badge" [class.text-bg-success]="sub.status==='ACTIVE'" [class.text-bg-secondary]="sub.status!=='ACTIVE'">{{ sub.status }}</span></td>
+            <td>{{ sub.startDate }}</td>
+            <td>{{ sub.endDate }}</td>
+            <td>
+              <button *ngIf="sub.status==='ACTIVE'" class="btn btn-sm btn-outline-danger" [disabled]="actionLoading" (click)="cancelSubscription(sub.id)">
+                Annuler
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #emptyState>
+      <div class="alert alert-warning mb-0">Aucun abonnement trouvé.</div>
+    </ng-template>
+  </div>
+</section>

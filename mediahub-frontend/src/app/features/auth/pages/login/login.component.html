@@ -1,0 +1,40 @@
+<section class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-3">{{ mode === 'login' ? 'Connexion' : 'Inscription' }}</h1>
+
+        <div class="btn-group mb-3" role="group">
+          <button class="btn" [class.btn-primary]="mode==='login'" [class.btn-outline-primary]="mode!=='login'" (click)="switchMode('login')">
+            Login
+          </button>
+          <button class="btn" [class.btn-primary]="mode==='register'" [class.btn-outline-primary]="mode!=='register'" (click)="switchMode('register')">
+            Inscription
+          </button>
+        </div>
+
+        <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+        <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+        <div class="mb-3">
+          <label class="form-label">Username</label>
+          <input class="form-control" [(ngModel)]="username" placeholder="hamza">
+        </div>
+
+        <div class="mb-3" *ngIf="mode==='register'">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" [(ngModel)]="email" placeholder="email@mediahub.com">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-control" [(ngModel)]="password" placeholder="********">
+        </div>
+
+        <button class="btn btn-primary w-100" [disabled]="loading" (click)="submit()">
+          {{ loading ? 'Chargement...' : (mode === 'login' ? 'Se connecter' : 'S\'inscrire') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

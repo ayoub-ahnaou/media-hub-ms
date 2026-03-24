@@ -1,0 +1,66 @@
+<section class="mb-4">
+  <h1 class="h3 mb-1">Historique de visionnage</h1>
+  <p class="text-muted mb-0">Ajouter et consulter les médias visionnés</p>
+</section>
+
+<div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+<div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+<section class="card mb-4">
+  <div class="card-body">
+    <h2 class="h6">Ajouter / mettre à jour une entrée</h2>
+    <div class="row g-2 align-items-end">
+      <div class="col-12 col-md-4">
+        <label class="form-label">Media ID</label>
+        <input class="form-control" type="number" [(ngModel)]="mediaId" placeholder="1">
+      </div>
+      <div class="col-12 col-md-4">
+        <label class="form-label">Progression (secondes)</label>
+        <input class="form-control" type="number" min="0" [(ngModel)]="progress" placeholder="120">
+      </div>
+      <div class="col-12 col-md-4 d-flex gap-2">
+        <button class="btn btn-primary" [disabled]="actionLoading" (click)="addHistory()">Sauvegarder</button>
+        <button class="btn btn-outline-danger" [disabled]="actionLoading" (click)="clearAll()">Vider tout</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div *ngIf="loading" class="alert alert-info">Chargement de l'historique...</div>
+
+<section class="card" *ngIf="!loading">
+  <div class="card-body">
+    <h2 class="h6">Entrées</h2>
+
+    <div class="table-responsive" *ngIf="history.length > 0; else emptyState">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Media ID</th>
+            <th>Progress</th>
+            <th>Date</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of history">
+            <td>{{ item.id }}</td>
+            <td>{{ item.mediaId }}</td>
+            <td>{{ item.progress }} s</td>
+            <td>{{ item.watchedAt | date:'short' }}</td>
+            <td>
+              <button class="btn btn-sm btn-outline-danger" [disabled]="actionLoading" (click)="deleteOne(item.id)">
+                Supprimer
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #emptyState>
+      <div class="alert alert-warning mb-0">Aucune entrée d'historique.</div>
+    </ng-template>
+  </div>
+</section>
