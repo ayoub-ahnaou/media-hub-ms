@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -58,6 +59,11 @@ public class UserController {
             @PathVariable Long id,
             @RequestParam Role role) {
         return ResponseEntity.ok(userService.updateRole(id, role));
+    }
+
+    @GetMapping("/{id}/subscription-status")
+    public ResponseEntity<Map<String, Boolean>> getSubscriptionStatus(@PathVariable Long id) {
+        return ResponseEntity.ok(Map.of("active", userService.isSubscriptionActive(id)));
     }
 }
 

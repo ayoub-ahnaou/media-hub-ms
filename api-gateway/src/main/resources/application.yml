@@ -13,6 +13,11 @@ spring:
           # Any request starting with /api/users will be routed to user-service.
           - Path=/api/users/**
 
+        - id: user-auth
+          uri: lb://user-service
+          predicates:
+            - Path=/api/auth/**
+
         - id: media-service
           uri: lb://media-service
           predicates:

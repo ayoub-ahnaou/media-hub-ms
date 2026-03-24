@@ -1,7 +1,13 @@
 package com.user_service.user_service.dto;
 
+import lombok.*;
+
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class WatchHistoryResponseDTO {
     private Long          id;
     private Long          userId;

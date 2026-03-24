@@ -1,5 +1,6 @@
 package com.user_service.user_service.service;
 
+import com.user_service.user_service.client.SubscriptionClient;
 import com.user_service.user_service.dto.UserRequestDTO;
 import com.user_service.user_service.dto.UserResponseDTO;
 import com.user_service.user_service.enums.Role;
@@ -10,7 +11,7 @@ import com.user_service.user_service.model.User;
 import com.user_service.user_service.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +21,8 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+    private final SubscriptionClient subscriptionClient;
 
     // ✅ CREATE
 
@@ -94,5 +96,11 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("Utilisateur introuvable avec l'id : " + id));
         user.setRole(role);
         return userMapper.toDTO(userRepository.save(user));
+    }
+
+    public boolean isSubscriptionActive(Long userId) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur introuvable avec l'id : " + userId));
+        return Boolean.TRUE.equals(subscriptionClient.isUserActive(userId).get("active"));
     }
 }
